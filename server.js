@@ -60,6 +60,54 @@ const addRole = async () => {
     }])
     const data = await db.promise().query("INSERT INTO role SET ?", answer)
     veiwRoles()
+};
+const addEmployee = async () => {
+    const role_id = await db.promise().query("select id as value, title as name FROM role")
+    const manager_id = await db.promise().query("select id as value, lastName as name FROM employee")
+    const answer = await inquirer.prompt([{
+        type: "input",
+        name: "firstName",
+        message: "What is the first name of the employee?",
+    },
+    {
+        type: "input",
+        name: "lastName",
+        message: "What is the last name of the employee?",
+    },
+    {
+        type: "list",
+        name: "role_id",
+        message: "What is the employee role?",
+        choices: role_id[0],
+    },
+    {
+        type: "list",
+        name: "manager_id",
+        message: "Who is the manager of the employee?",
+        choices: manager_id[0],
+    },
+    ])
+    const data = await db.promise().query("INSERT INTO employee SET ?", answer)
+    veiwEmployees()
+};
+
+const updateEmployee = async () => {
+    const id = await db.promise().query("select id as value, lastName as name FROM employee")
+    const role_id = await db.promise().query("select id as value, title as name FROM role")
+    const answer = await inquirer.prompt([{
+        type: "list",
+        name: "id",
+        message: "select employee",
+        choices: id[0],
+    },
+    {
+        type:"list",
+        name:"role_id",
+        message:"select role",
+        choices: role_id[0],
+    }])
+    const data = await db.promise().query("update employee SET role_id = ? WHERE id = ?", [answer.role_id, answer.id])
+    veiwEmployees()
 }
 
 const mainMenu = async () => {
@@ -67,7 +115,7 @@ const mainMenu = async () => {
         type: "list",
         name: "name",
         message: "what do you want to do",
-        choices: ["Veiw Employees", "Veiw Departments", "Veiw Roles", "Add Department", "Add Role"]
+        choices: ["Veiw Employees", "Veiw Departments", "Veiw Roles", "Add Department", "Add Role", "Add Employee", "Update Employee"]
 
     }])
     switch (answer.name) {
@@ -85,6 +133,12 @@ const mainMenu = async () => {
             break
         case "Add Role":
             addRole()
+            break
+        case "Add Employee":
+            addEmployee()
+            break
+            case "Update Employee":
+            updateEmployee()
             break
     }
 }
